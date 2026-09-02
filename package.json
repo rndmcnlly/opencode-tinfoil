@@ -1,0 +1,59 @@
+{
+  "name": "opencode-tinfoil",
+  "version": "0.1.0",
+  "description": "Verified Tinfoil inference transport for OpenCode",
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "tinfoil",
+    "confidential-computing",
+    "attestation",
+    "ehbp"
+  ],
+  "license": "MIT",
+  "author": "Adam Smith <adam@adamsmith.as> (https://adamsmith.as)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rndmcnlly/opencode-tinfoil.git"
+  },
+  "homepage": "https://github.com/rndmcnlly/opencode-tinfoil#readme",
+  "bugs": {
+    "url": "https://github.com/rndmcnlly/opencode-tinfoil/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist",
+    "test": "tsx --test test/*.test.ts",
+    "check": "npm run build && npm test",
+    "prepack": "npm run clean && npm run build"
+  },
+  "dependencies": {
+    "tinfoil": "1.2.1"
+  },
+  "peerDependencies": {
+    "@opencode-ai/plugin": ">=1.0.0"
+  },
+  "devDependencies": {
+    "@opencode-ai/plugin": ">=1.15.0",
+    "@types/node": "^22.19.19",
+    "tsx": "^4.23.1",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
