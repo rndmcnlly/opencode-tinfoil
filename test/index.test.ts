@@ -34,19 +34,61 @@ async function configuredProvider(
 }
 
 describe("opencode-tinfoil", () => {
-  it("defaults to the direct Tinfoil service", async () => {
+  it("defaults to the direct Tinfoil service and OpenCode-managed auth", async () => {
     const plugin = createTinfoilPlugin(() => ({ fetch }))
-    const hooks = await plugin(input, {
-      apiKey: "direct-tinfoil-key",
-    })
+    const hooks = await plugin(input)
     const config = {} as Config
     await hooks.config!(config)
     const provider = config.provider!.tinfoil as any
 
     assert.equal(provider.name, "Tinfoil")
-    assert.equal(provider.options.apiKey, "direct-tinfoil-key")
+    assert.equal(provider.options.apiKey, undefined)
     assert.equal(provider.options.baseURL, "https://inference.tinfoil.sh/v1/")
     assert.equal(provider.models, undefined)
+  })
+
+  it("can upgrade marked providers without creating the default provider", async () => {
+    const created: TinfoilSecureClientOptions[] = []
+    const plugin = createTinfoilPlugin((secureOptions) => {
+      created.push(secureOptions)
+      return { fetch: async () => new Response("encrypted response") }
+    })
+    const hooks = await plugin(input, { defaultProvider: false })
+    const config = {
+      provider: {
+        "bayleaf-sealed-remote": {
+          npm: "@ai-sdk/openai-compatible",
+          name: "BayLeaf Sealed Remote",
+          options: {
+            baseURL: "https://api.example/sealed/v1/",
+            apiKey: "bayleaf-key",
+            tinfoil: {
+              attestationBundleURL: "https://api.example/sealed",
+              transport: "ehbp",
+            },
+          },
+          models: { "example-model": { name: "Example Model" } },
+        },
+      },
+    } as Config
+    await hooks.config!(config)
+
+    const provider = config.provider!["bayleaf-sealed-remote"] as any
+    assert.equal(config.provider!.tinfoil, undefined)
+    assert.equal(provider.options.apiKey, "bayleaf-key")
+    assert.equal(provider.options.tinfoil, undefined)
+    assert.equal(provider.options.includeUsage, true)
+    assert.equal(created.length, 0)
+
+    await provider.options.fetch("https://api.example/sealed/v1/chat/completions")
+    assert.deepEqual(created, [{
+      baseURL: "https://api.example/sealed/v1/",
+      attestationBundleURL: "https://api.example/sealed",
+      enclaveURL: undefined,
+      configRepo: undefined,
+      transport: "ehbp",
+      userCacheSecret: undefined,
+    }])
   })
 
   it("adds an OpenCode provider backed by the bundled compatible adapter", async () => {
@@ -121,9 +163,30 @@ describe("opencode-tinfoil", () => {
       plugin(input, { providerID: "proxy", apiKey: "test-key" }),
       /models is required when providerID is not "tinfoil"/,
     )
+    await assert.rejects(plugin(input, { apiKey: "" }), /apiKey must be a non-empty string/)
+    await assert.rejects(plugin(input, { defaultProvider: "no" }), /defaultProvider must be a boolean/)
+  })
+
+  it("rejects invalid marked providers", async () => {
+    const plugin = createTinfoilPlugin(() => ({ fetch }))
+    const hooks = await plugin(input, { defaultProvider: false })
+
     await assert.rejects(
-      plugin(input, { models: options.models }),
-      /apiKey must be a non-empty string/,
+      hooks.config!({
+        provider: { invalid: { options: { tinfoil: true } } },
+      } as Config),
+      /options.tinfoil must be an object/,
+    )
+    await assert.rejects(
+      hooks.config!({
+        provider: {
+          invalid: {
+            npm: "@ai-sdk/anthropic",
+            options: { tinfoil: {} },
+          },
+        },
+      } as Config),
+      /must use @ai-sdk\/openai-compatible/,
     )
   })
 
