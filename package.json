@@ -46,19 +46,17 @@
     "prepack": "npm run clean && npm run build"
   },
   "dependencies": {
+    "@opencode/ai": "2.0.15",
+    "effect": "4.0.0-rc.112",
     "tinfoil": "1.2.1"
   },
   "peerDependencies": {
     "@opencode-ai/plugin": ">=1.18.29",
-    "@opencode/ai": ">=2.0.15 <3",
-    "@opencode/plugin": ">=2.0.15 <3",
-    "effect": "4.0.0-rc.112"
+    "@opencode/plugin": ">=2.0.15 <3"
   },
   "peerDependenciesMeta": {
     "@opencode-ai/plugin": { "optional": true },
-    "@opencode/ai": { "optional": true },
-    "@opencode/plugin": { "optional": true },
-    "effect": { "optional": true }
+    "@opencode/plugin": { "optional": true }
   },
   "devDependencies": {
     "@opencode-ai/plugin": ">=1.15.0",

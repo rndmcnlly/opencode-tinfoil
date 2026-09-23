@@ -72,6 +72,17 @@ transform order. For migrated V1 config, the plugin instead upgrades each
 marked model's package after providers are registered, allowing the same
 provider definition on V1 (1.18.29+) and V2.
 
+V2 requires the `plugins` key (and the object form for plugin options), as
+shown above. Its V1 compatibility for `provider` definitions does **not**
+activate a V1 `plugin` entry. When serving configuration to both versions,
+arrange for each client to load the plugin using its own version's plugin
+declaration; otherwise a V1-style marked provider may remain on the ordinary
+HTTP runtime. A service that uses this transport should reject plaintext
+inference independently of the client plugin.
+
+The published package installs its V2 provider-runtime dependencies alongside
+the plugin. You do not need to install `@opencode/ai` or `effect` separately.
+
 ## OpenCode V1 (1.18.29+)
 
 Add the plugin to create the canonical Tinfoil provider:
