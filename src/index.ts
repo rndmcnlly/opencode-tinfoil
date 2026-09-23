@@ -1,5 +1,6 @@
 import type { Plugin, PluginOptions } from "@opencode-ai/plugin"
 import { SecureClient } from "tinfoil"
+import { TinfoilV2 } from "./v2.js"
 
 const DEFAULT_BASE_URL = "https://inference.tinfoil.sh/v1/"
 
@@ -207,4 +208,6 @@ export function createTinfoilPlugin(
 
 export const Tinfoil: Plugin = createTinfoilPlugin()
 
-export default Tinfoil
+// V1 (1.18.29+) calls server; V2 calls setup. Keep the V1 factory available
+// for integrations that construct the old plugin directly.
+export default { ...TinfoilV2, server: Tinfoil }
