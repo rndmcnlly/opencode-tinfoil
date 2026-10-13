@@ -1,7 +1,7 @@
 import { OpenAICompatible } from "@opencode/ai/providers/openai-compatible"
 import { LanguageModel } from "@opencode/ai/schema/options"
 import { Effect } from "effect"
-import { HttpClientRequest, HttpClientResponse } from "effect/unstable/http"
+import { HttpClientRequest, HttpClientResponse } from "effect/http"
 import { SecureClient } from "tinfoil"
 import type { TinfoilSecureClientOptions } from "./index.js"
 

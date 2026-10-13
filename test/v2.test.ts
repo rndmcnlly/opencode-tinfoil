@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import { it } from "node:test"
 import { Effect } from "effect"
-import { HttpClientRequest } from "effect/unstable/http"
+import { HttpClientRequest } from "effect/http"
 import { model, verifiedMiddleware } from "../src/provider.js"
 import { TinfoilV2, V2_PACKAGE } from "../src/v2.js"
 
