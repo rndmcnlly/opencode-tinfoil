@@ -18,11 +18,17 @@ export function verifiedMiddleware(client: SecureFetch) {
       return Effect.fail(new Error("opencode-tinfoil: unexpected inference body format"))
     }
     return Effect.tryPromise({
-      try: async () => {
+      try: async (signal) => {
+        const headers = new Headers(outgoing.headers)
+        // EHBP rewrites the request body. Let the secure transport frame the
+        // encrypted bytes rather than forwarding the plaintext framing.
+        headers.delete("content-length")
+        headers.delete("transfer-encoding")
         const response = await client.fetch(outgoing.url, {
           method: outgoing.method,
-          headers: outgoing.headers,
+          headers,
           body: body.body,
+          signal,
         })
         return HttpClientResponse.fromWeb(outgoing, response)
       },

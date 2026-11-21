@@ -1,6 +1,6 @@
 {
   "name": "opencode-tinfoil",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Verified Tinfoil inference transport for OpenCode",
   "keywords": [
     "opencode",
@@ -55,9 +55,15 @@
     "effect": "^4.0.1"
   },
   "peerDependenciesMeta": {
-    "@opencode-ai/plugin": { "optional": true },
-    "@opencode/plugin": { "optional": true },
-    "effect": { "optional": true }
+    "@opencode-ai/plugin": {
+      "optional": true
+    },
+    "@opencode/plugin": {
+      "optional": true
+    },
+    "effect": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@opencode-ai/plugin": ">=1.15.0",

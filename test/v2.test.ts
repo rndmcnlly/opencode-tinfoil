@@ -14,13 +14,23 @@ it("routes the native request and response through verified fetch only", async (
     },
   } as never)
   const request = HttpClientRequest.bodyText(
-    HttpClientRequest.post("https://inference.tinfoil.sh/v1/chat/completions"),
+    HttpClientRequest.post("https://inference.tinfoil.sh/v1/chat/completions", {
+      headers: { authorization: "Bearer fixture", "transfer-encoding": "chunked" },
+    }),
     "private prompt",
   )
   const result = await Effect.runPromise(middleware(request))
   assert.equal(await Effect.runPromise(result.text), "verified")
   assert.equal(seen.length, 1)
-  assert.equal((seen[0] as [unknown, RequestInit])[1].body instanceof Uint8Array, true)
+  const [, init] = seen[0] as [unknown, RequestInit]
+  assert.equal(init.body instanceof Uint8Array, true)
+  assert.equal(request.headers["content-length"], "14")
+  assert.equal(request.headers["transfer-encoding"], "chunked")
+  const headers = new Headers(init.headers)
+  assert.equal(headers.get("content-length"), null)
+  assert.equal(headers.get("transfer-encoding"), null)
+  assert.equal(headers.get("authorization"), "Bearer fixture")
+  assert.equal(headers.get("content-type"), "text/plain")
 
   const failure = new Error("attestation rejected")
   const failing = verifiedMiddleware({ fetch: async () => { throw failure } } as never)
